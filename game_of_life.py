@@ -22,19 +22,19 @@ def get_neighbors(grid, x, y):
             count += 1
     return count
 
-def next_generation(grid):
+def next_generation(grid, survival_rules):
     new_grid = []
     for x in range(len(grid)):
         new_row = []
         for y in range(len(grid[0])):
             alive_neighbors = get_neighbors(grid, x, y)
             if grid[x][y] == 'X':
-                if alive_neighbors in (2, 3):
+                if alive_neighbors in survival_rules['stay_alive']:
                     new_row.append('X')
                 else:
                     new_row.append('.')
             else:
-                if alive_neighbors == 3:
+                if alive_neighbors in survival_rules['become_alive']:
                     new_row.append('X')
                 else:
                     new_row.append('.')
@@ -48,6 +48,25 @@ def has_live_cells(grid):
     return False
 
 def main():
+    print("Choose survival rules:")
+    print("1. Weak cells")
+    print("2. Toughth cells")
+    choice = input("Enter 1 or 2: ")
+
+    if choice == '1':
+        survival_rules = {
+            'stay_alive': [3, 4],
+            'become_alive': [3]
+        }
+    elif choice == '2':
+        survival_rules = {
+            'stay_alive': [2, 3],
+            'become_alive': [3]
+        }
+    else:
+        print("Invalid choice. Exiting.")
+        return
+
     file_path = input("Enter the relative path to the map file: ")
     try:
         grid = read_map(file_path)
@@ -64,7 +83,7 @@ def main():
             break
         try:
             input("Press ENTER to continue...")
-            grid = next_generation(grid)
+            grid = next_generation(grid, survival_rules)
         except KeyboardInterrupt:
             print("\nExiting the Game of Life.")
             break
